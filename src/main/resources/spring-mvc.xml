@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc 
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd ">
+	<!-- xmlns:mvc增加命名空间，才能使用mvc开头的标签， xsi:schemaLocation增加命名空间对应的xsd -->
+	
+	<!-- Spring boot自动配置时是通过AnnotationConfigApplicationContext启动Spring的，所以自动已经添加了注解驱动，此处可不配 -->
+	<context:annotation-config/>
+	<context:component-scan base-package="com.netease.springboot"></context:component-scan>
+	<mvc:annotation-driven />
+	
+	<!-- interceptor拦截器配置 
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path=""/>
+			<bean name="i" class="" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+	-->
+	
+	<!-- 默认所有的URL都被dispatcherServlet拦截，此处针对静态资源进行配置 -->
+	<!-- Wildcard	Description	 
+			?	匹配任何单字符	 
+			*	匹配0或者任意数量的字符	 
+			**	匹配0或者更多的目录 -->
+	<mvc:resources location="classpath:/public/images/" mapping="/public/images/**"></mvc:resources>
+	<mvc:resources location="classpath:/public/css/" mapping="/public/css/**"></mvc:resources>
+	
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+		<property name="order" value="0" />
+		<property name="useDefaultSuffixPattern" value="false" />
+	</bean>
+	<bean id="beanNameUrlHandlingMapping"
+		class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
+
+	<!-- 支持上传文件 -->
+	<!-- <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"/> -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.support.StandardServletMultipartResolver" />
+
+	<!-- 内容协商视图解析器 同一资源，多种表述 -->
+	<bean name="viewResolver"
+		class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="defaultContentType" value="text/html" />
+		<!-- 扩展名至mimeType的映射,即 /user.json => application/json -->
+		<property name="mediaTypes">
+			<map>
+				<entry key="html" value="text/html" />
+				<entry key="json" value="application/json" />
+				<entry key="xml" value="application/xml" />
+				<entry key="xls" value="application/vnd.ms-excel" />
+			</map>
+		</property>
+		<!-- 用于开启 /userinfo/123?format=json 的支持 默认是true -->
+		<property name="favorParameter" value="true" />
+
+		<!-- 用于开启 请求头中 ACCEPT:application/json 的支持 默认是false -->
+		<property name="ignoreAcceptHeader" value="false"></property>
+
+		<!-- 用于开启 /userinfo.json 的支持 默认是true -->
+		<property name="favorPathExtension" value="true"></property>
+
+		<property name="viewResolvers">
+			<list>
+				<bean class="org.springframework.web.servlet.view.BeanNameViewResolver" />
+				<bean
+					class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+					<property name="cache" value="true" />
+					<property name="suffix" value=".ftl" />
+					<property name="contentType" value="text/html;charset=utf-8" />
+					<property name="exposeRequestAttributes" value="true" />
+					<property name="exposeSessionAttributes" value="true" />
+					<property name="exposeSpringMacroHelpers" value="true" />
+					<property name="allowSessionOverride" value="true" />
+				</bean>
+			</list>
+		</property>
+		<property name="defaultViews">
+			<list>
+				<bean
+					class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 上面没匹配到则会使用这个视图解析器 -->
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="order" value="2" />
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+	</bean>
+
+	<bean id="freemarkerConfig"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="classpath:public/templates/" />
+		<property name="freemarkerSettings">
+			<props>
+				<prop key="template_update_delay">0</prop>
+				<prop key="default_encoding">utf-8</prop>
+				<prop key="locale">zh_cn</prop>
+				<prop key="number_format">0.##########</prop>
+				<prop key="url_escaping_charset">UTF-8</prop>
+				<prop key="template_exception_handler">html_debug</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- Spring MVC的异常处理   -->
+	<bean name="exceptionResolver"
+		class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="exceptionMappings">
+			<props>
+				<prop key="org.apache.shiro.authz.UnauthenticatedException">pages/403</prop>
+				<prop key="org.apache.shiro.authz.UnauthorizedException">pages/403</prop>
+				<prop key="org.apache.shiro.authc.LockedAccountException">pages/locked</prop>
+				<prop key="java.lang.Throwable">pages/500</prop>
+			</props>
+		</property>
+	</bean>
+</beans>
