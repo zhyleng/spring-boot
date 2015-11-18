@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 
 import com.netease.springboot.controller.TestServlet;
+import com.netease.springboot.filter.TestFilter;
 import com.netease.springboot.model.User;
 
 @PropertySource("classpath:application-dev.properties")
@@ -35,7 +37,20 @@ public class ApplicationConfig {
 	public ServletRegistrationBean servletRegistrationBean() {
 		ServletRegistrationBean srb = new ServletRegistrationBean();
 		srb.setServlet(new TestServlet());
-		srb.setUrlMappings(Arrays.asList("/ts"));
+		srb.setUrlMappings(Arrays.asList("/one"));
+		srb.setLoadOnStartup(1);
+		srb.setEnabled(true);
+		srb.setOrder(1);
 		return srb;
+	}
+	
+	@Bean
+	public FilterRegistrationBean filterRegistrationBean() {
+		FilterRegistrationBean frb = new FilterRegistrationBean();
+		frb.setFilter(new TestFilter());
+		frb.setEnabled(true);
+		frb.setUrlPatterns(Arrays.asList("/ts", "/test"));
+		frb.setOrder(1);
+		return frb;
 	}
 }

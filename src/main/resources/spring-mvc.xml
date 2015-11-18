@@ -14,6 +14,8 @@
 	<!-- Spring boot自动配置时是通过AnnotationConfigApplicationContext启动Spring的，所以自动已经添加了注解驱动，此处可不配 -->
 	<context:annotation-config/>
 	<context:component-scan base-package="com.netease.springboot"></context:component-scan>
+	<!-- 注入DefaultAnnotationHandlerAdapter 和  AnnotationMethodHandlerMapping 
+	在这两个bean中会自动装配 7个HttpMessageConverter所以在 controller中可以用@RequestBody等这些注解-->
 	<mvc:annotation-driven />
 	
 	<!-- interceptor拦截器配置 
