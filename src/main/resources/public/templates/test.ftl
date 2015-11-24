@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<title>Freemarker</title>
-</hedd>
+</head>
 
 <style>
 	#div-center {
@@ -22,7 +22,7 @@
 		</ul>
 		<#if map?exists>
 			<#list map?keys as key>
-				<span>Key:${key}</span>
+				<span >Key:${key}</span>
 				<span>Value:${map[key].name}</span>
 				<br/>
 			</#list>
@@ -63,25 +63,51 @@
 		${"first"?lower_case}
 		${"first"?replace("[fi]{2,}", "F")}
 		${dfkadfla!"ceshi"}
+		<#-- 8 +8 8.00都是相等的-->
+		${(8=8.00)?string("true", "false")}
+		<#assign listlist = 1..5>
+		<#list listlist as iii>
+			<div>${iii_has_next?string("true", "false")}</div>
+		</#list>
+		<#noparse> 
+			<#list books as book> 
+			   <tr><td>${book.name}<td>作者:${book.author} 
+			</#list> 
+		</#noparse> 
+		<#escape x as x>
+			${"测试&&&<>"}
+		</#escape>
 	</div>
 	<#-- 导入ftl模板文件 -->
 	<#include "app/test.ftl">
 	<#-- 导入ftl模板文件中的变量、宏等，并将此模板文件的命名空间设为test， 此模板文件中的变量通过test.来访问， import并不会对导入模板文件中的内容进行渲染
 	-->
-	<#import "/app/test.ftl" as test>
-	${test.xy!"xy么导入"}
+	<#--<#import "/app/test.ftl" as test>-->
+	<#--${test.xy!"xy么导入"}-->
+	<@test title="自定义标题"/>
 	
-	<#-- 8 +8 8.00都是相等的-->
-	${(8=8.00)?string("true", "false")}
-	<#assign listlist = [1..5]>
-	<#list listlist as iii>
-		<div>${iii_has_next?string("true", "false")}</div>
-	</#list>
-	<#noparse> 
-		<#list books as book> 
-   		<tr><td>${book.name}<td>作者:${book.author} 
-		</#list> 
-	</#noparse> 
+	<@wrap count=6>
+		<span>nested</span>
+	</@wrap>
+	
+	<#if isEmpty("")>
+		isEmpty("");
+	</#if>
+	<#if isEmpty("i")>
+		isEmpty("i");
+	<#else>
+	</#if>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<#-- <#macro> 最复杂的用法-->
+	<@repeat count=4; x,halfx,isNotLast>
+		${x}, ${halfx}<#if isNotLast>;<#else>.</#if><br/><#-- x,halfx,isNotLast参数是在宏macro内部的nested传递的-->
+	</@repeat>
+	
+	${.now?string("yyyy-MM-dd HH:mm:ss.S")}
+	
 </body>
 </html>
 	

@@ -5,6 +5,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
@@ -26,7 +30,8 @@ public class TestController {
 	}
 	
 	@RequestMapping("/test")
-	String test(Model model) {
+	String test(Model model, HttpServletRequest request) {
+		//System.out.println(request.getParameter("test"));
 		model.addAttribute("items", new User[]{new User(41, "Leng"), new User(1231, "Zhao"), new User(1231, "Yang")});
 		Map<String, User> map = new HashMap<String, User>();
 		map.put("user1", new User(41, "Leng"));
@@ -47,6 +52,16 @@ public class TestController {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");  
         dateFormat.setLenient(false);  
         webDataBinder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, false));
+	}
+	
+	@PostConstruct
+	public void init() {
+		System.out.println("Test Controller init ... ");
+	}
+	
+	@PreDestroy
+	public void destroy() {
+		System.out.println("Test Controller destroy ... ");
 	}
 
 }
